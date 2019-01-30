@@ -24,58 +24,32 @@ func SubString(str string, start int, length int) string {
 	return string(r[start:end])
 }
 
-// func RandomString(n int) string {
-// 	letters := []rune("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
-// 	randStr := make([]rune, n)
-// 	for i := range randStr {
-// 		randStr[i] = letters[rand.Intn(len(letters))]
-// 	}
-// 	return string(randStr)
-// }
-
-func RandomString(n int) string {
-	const letterBytes = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+func RandomString(n int, format int) string {
 	const (
-		letterIdxBits = 6                    // 6 bits to represent a letter index
-		letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
-		letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
+		CHAR_NUMBER        = `0123456789`
+		CHAR_LETTERS_LOWER = `abcdefghijklmnopqrstuvwxyz`
+		CHAR_LETTERS_UPPER = `ABCDEFGHIJKLMNOPQRSTUVWXYZ`
+		CHAR_SYMBOLS       = `~!@#$%^&*()_+-={}|[]\:";'<>?,./`
 	)
 
-	var src = rand.NewSource(time.Now().UnixNano())
+	var chars []rune
+	switch format {
+	case 0:
+		chars = []rune(CHAR_NUMBER)
 
-	b := make([]byte, n)
-	// A src.Int63() generates 63 random bits, enough for letterIdxMax characters!
-	for i, cache, remain := n-1, src.Int63(), letterIdxMax; i >= 0; {
-		if remain == 0 {
-			cache, remain = src.Int63(), letterIdxMax
-		}
-		if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
-			b[i] = letterBytes[idx]
-			i--
-		}
-		cache >>= letterIdxBits
-		remain--
+	case 1:
+		chars = []rune(CHAR_NUMBER + CHAR_LETTERS_LOWER)
+
+	case 2:
+		chars = []rune(CHAR_NUMBER + CHAR_LETTERS_LOWER + CHAR_LETTERS_UPPER)
+
+	default:
+		chars = []rune(CHAR_NUMBER + CHAR_LETTERS_LOWER + CHAR_LETTERS_UPPER + CHAR_SYMBOLS)
 	}
-	return string(b)
+	rand.Seed(time.Now().UnixNano())
+	randString := make([]rune, n)
+	for i := range randString {
+		randString[i] = chars[rand.Intn(len(chars))]
+	}
+	return string(randString)
 }
-
-// // markdown to html
-// func Markdown2Html(markdown string) string {
-// 	return string(blackfriday.MarkdownBasic([]byte(markdown)))
-// }
-
-// // html to markdown
-// func Html2Markdown(html string) string {
-// 	return string(blackfriday.MarkdownBasic([]byte(html)))
-// }
-
-// // make v4 uuid
-// func Uuid() string {
-// 	return uuid.Must(uuid.NewV4()).String()
-// }
-
-// // parse uuid
-// func UuidParse(str string) uuid.UUID {
-// 	return uuid.FromStringOrNil(str)
-// }
